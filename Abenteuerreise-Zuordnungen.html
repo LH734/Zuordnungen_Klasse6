@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Die große Abenteuerreise – Zuordnungen</title>
+<style>
+:root{--s1:#DC2626;--s2:#16A34A;--s3:#0284C7;--s4:#7C3AED;--s5:#0891B2;--bonus:#CA8A04;--bg:#FFF7ED;--card:#FFF;--tx:#1E293B;--txL:#64748B;--ok:#22C55E;--err:#EF4444;--warn:#F59E0B;--cur:var(--s1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+.hidden{display:none!important}
+#topBar{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+#topBar .title{font-size:1.2rem;font-weight:700}
+#topBar .pts{background:rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-weight:600}
+#pbo{height:6px;background:rgba(255,255,255,.3);border-radius:3px;flex:1;margin:0 16px;max-width:300px}
+#pbi{height:100%;background:#FDE047;border-radius:3px;transition:width .5s;width:0%}
+.scr{max-width:920px;margin:0 auto;padding:24px 16px;display:none}
+.scr.active{display:block}
+#startScr.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#startScr{text-align:center;min-height:80vh}
+#startScr h1{font-size:2.4rem;background:linear-gradient(135deg,#F59E0B,#EF4444,#8B5CF6,#0EA5E9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+#startScr .sub{font-size:1.1rem;color:var(--txL);margin-bottom:32px}
+#nameIn{font-size:1.1rem;padding:12px 20px;border:3px solid #C7D2FE;border-radius:16px;outline:none;text-align:center;width:300px;max-width:90vw}
+#nameIn:focus{border-color:#6366F1}
+.startBtn{margin-top:24px;font-size:1.3rem;padding:16px 48px;border:none;border-radius:20px;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;cursor:pointer;font-weight:700;box-shadow:0 4px 16px rgba(99,102,241,.4);transition:transform .15s}
+.startBtn:hover{transform:scale(1.05)}
+#mapScr h2{text-align:center;font-size:1.6rem;margin-bottom:24px}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:24px}
+.sc{background:var(--card);border-radius:20px;padding:24px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;border:3px solid transparent;position:relative}
+.sc:hover:not(.lk){transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.sc.lk{opacity:.5;cursor:not-allowed;filter:grayscale(.6)}
+.sc.act{box-shadow:0 0 0 4px rgba(99,102,241,.15)}
+.sc.done{border-color:var(--ok)}
+.sc .em{font-size:2.4rem;display:block;margin-bottom:8px}
+.sc .sn{font-weight:700;font-size:1.1rem;margin-bottom:4px}
+.sc .sd{font-size:.85rem;color:var(--txL)}
+.sc .li{position:absolute;top:12px;right:12px;font-size:1.4rem}
+.sc .st{margin-top:8px;font-size:1.2rem;color:#F59E0B}
+#taskScr{padding-bottom:80px}
+.th{text-align:center;margin-bottom:20px}
+.th .sl{display:inline-block;padding:6px 16px;border-radius:12px;color:#fff;font-weight:700;font-size:.9rem;margin-bottom:8px}
+.tp{font-size:.95rem;color:var(--txL);margin-bottom:4px}
+.tpb{height:8px;background:#E2E8F0;border-radius:4px;margin:8px auto;max-width:400px}
+.tpf{height:100%;border-radius:4px;transition:width .4s}
+.tc{background:var(--card);border-radius:20px;padding:28px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);border:2px solid #E2E8F0}
+.tc .intro{font-size:1.05rem;margin-bottom:16px;line-height:1.6}
+.tc .intro strong{color:var(--cur)}
+.vt{border-collapse:collapse;margin:12px auto;font-size:1rem}
+.vt th,.vt td{border:2px solid #CBD5E1;padding:10px 16px;text-align:center;min-width:55px}
+.vt th{background:#F1F5F9;font-weight:700}
+.vt input{width:70px;padding:6px;border:2px solid #C7D2FE;border-radius:8px;text-align:center;font-size:1rem;outline:none}
+.vt input:focus{border-color:#6366F1}
+.btn{display:inline-block;padding:12px 28px;border:none;border-radius:14px;font-size:1rem;font-weight:600;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.03)}
+.btn:active{transform:scale(.98)}
+.bp{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;box-shadow:0 3px 12px rgba(99,102,241,.3)}
+.bs{background:var(--ok);color:#fff}
+.bw{background:var(--warn);color:#fff}
+.bst{color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.15)}
+.mo{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.mb{flex:1 1 calc(50% - 10px);min-width:200px;padding:14px 20px;border:3px solid #E2E8F0;border-radius:16px;background:var(--card);font-size:1rem;cursor:pointer;transition:all .2s;text-align:left;font-weight:500}
+.mb:hover{border-color:var(--cur);background:#F8FAFC}
+.mb.ok{border-color:var(--ok);background:#F0FDF4;pointer-events:none}
+.mb.no{border-color:var(--err);background:#FEF2F2}
+.mb.dis{pointer-events:none;opacity:.7}
+.tfb{display:flex;gap:12px;margin:12px 0}
+.tf{flex:1;padding:14px;border:3px solid #E2E8F0;border-radius:16px;background:var(--card);font-size:1.1rem;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+.tf:hover{border-color:var(--cur)}
+.tf.ok{border-color:var(--ok);background:#F0FDF4}
+.tf.no{border-color:var(--err);background:#FEF2F2}
+.fb{padding:14px 20px;border-radius:14px;margin:12px 0;font-weight:600;font-size:1rem;display:none}
+.fb.s{background:#F0FDF4;color:#15803D;border:2px solid #86EFAC;display:block}
+.fb.e{background:#FEF2F2;color:#B91C1C;border:2px solid #FCA5A5;display:block}
+.fb.h{background:#FFFBEB;color:#92400E;border:2px solid #FCD34D;display:block}
+.sol{background:#F0F9FF;border:2px solid #7DD3FC;border-radius:14px;padding:16px 20px;margin:12px 0;font-size:.95rem;line-height:1.7}
+.sol .lb{font-weight:700;color:var(--s3)}
+.gs{display:inline-block;padding:4px 12px;border:2px solid #C7D2FE;border-radius:8px;font-size:1rem;background:#F8FAFC;cursor:pointer;min-width:120px}
+.gs.ok{border-color:var(--ok);background:#F0FDF4}
+.gs.no{border-color:var(--err);background:#FEF2F2}
+.ni{width:80px;padding:8px;border:2px solid #C7D2FE;border-radius:8px;text-align:center;font-size:1rem;outline:none}
+.ni:focus{border-color:#6366F1}
+.row{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
+.confetti{position:fixed;width:10px;height:10px;border-radius:50%;z-index:9999;pointer-events:none;animation:cfall 1.5s ease-out forwards}
+@keyframes cfall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+.cwr{text-align:center;padding:24px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:20px;margin:20px 0;border:3px solid #F59E0B}
+.cwr .frag{font-size:2rem;font-weight:900;letter-spacing:8px;color:#92400E;margin:12px 0}
+.cert{background:#fff;border:4px solid #F59E0B;border-radius:24px;padding:40px;max-width:600px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.1);position:relative;overflow:hidden}
+.cert::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(245,158,11,.03) 20px,rgba(245,158,11,.03) 40px);pointer-events:none}
+.cert h2{font-size:1.8rem;color:#92400E;margin-bottom:8px}
+.svgC{display:flex;justify-content:center;margin:16px 0}
+.svgC svg{max-width:100%;height:auto}
+.qbox{padding:14px;background:#F8FAFC;border-radius:12px;margin:10px 0;font-size:1.05rem;line-height:1.6}
+.stepbox{background:#F1F5F9;border-radius:12px;padding:14px;margin:8px 0}
+.stepbox .steplabel{font-weight:700;margin-bottom:6px;color:var(--cur)}
+@media(max-width:768px){#startScr h1{font-size:1.6rem}.sg{grid-template-columns:1fr}.mb{flex:1 1 100%;min-width:unset}.tc{padding:18px}.vt th,.vt td{padding:6px 10px}}
+</style>
+</head>
+<body>
+<div id="topBar" class="hidden">
+  <div class="title" id="topTitle">Die große Abenteuerreise</div>
+  <div id="pbo"><div id="pbi"></div></div>
+  <div class="pts" id="topPts">0 Punkte</div>
+</div>
+<div class="scr active" id="startScr">
+  <div style="font-size:4rem;margin-bottom:16px;">🌍✈️🗺️</div>
+  <h1>Die große Abenteuerreise</h1>
+  <p class="sub">Zuordnungen – direkte und indirekte Proportionalität<br>Klasse 6 Gymnasium</p>
+  <input type="text" id="nameIn" placeholder="Dein Name (freiwillig)">
+  <button class="startBtn" onclick="startGame()">Los geht's! 🚀</button>
+  <p style="margin-top:16px;font-size:.85rem;color:var(--txL);">Reise durch 5 spannende Stationen und werde zum Matheprofi!</p>
+</div>
+<div class="scr" id="mapScr">
+  <h2 id="mapGreet">Deine Reiseroute 🗺️</h2>
+  <div class="sg" id="stGrid"></div>
+  <div style="text-align:center;margin-top:12px;" id="cwProg"></div>
+</div>
+<div class="scr" id="taskScr">
+  <div class="th">
+    <span class="sl" id="tsl"></span>
+    <div class="tp" id="tpt"></div>
+    <div class="tpb"><div class="tpf" id="tpf"></div></div>
+  </div>
+  <div id="tC"></div>
+  <div style="text-align:center;margin-top:20px;">
+    <button class="btn bp hidden" id="nxBtn" onclick="nxTask()">Weiter ➡️</button>
+    <button class="btn bw hidden" id="solBtn" onclick="showSol()">Lösung zeigen 🔓</button>
+    <button class="btn bp hidden" id="mapBtn" onclick="showMap()">Zurück zur Karte 🗺️</button>
+  </div>
+</div>
+<div class="scr" id="certScr" style="text-align:center;min-height:80vh;display:none;flex-direction:column;align-items:center;justify-content:center;">
+  <div class="cert" id="certC"></div>
+  <button class="btn bp" style="margin-top:24px;" onclick="showMap()">Zurück zur Karte 🗺️</button>
+  <button class="btn bs" style="margin-top:12px;" onclick="window.print()">Reisepass drucken 🖨️</button>
+</div>
+<div class="hidden" id="toOv" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1000;">
+  <div style="background:#fff;border-radius:20px;padding:40px;text-align:center;">
+    <div style="font-size:2rem;">⏳</div>
+    <p style="font-size:1.1rem;margin:12px 0;">Warte kurz und denke nochmal nach...</p>
+    <div style="font-size:3rem;font-weight:900;color:var(--err);margin:16px 0;" id="toCD">2:00</div>
+  </div>
+</div>
+
+<script>
+// === CONSTANTS ===
+const CW="MATHEPROFI",CWF=["MA","TH","EP","RO","FI"];
+const STN=[
+  {id:1,em:"🚂",nm:"Bahnhof",ds:"Allgemeine Zuordnungen",cl:"#DC2626"},
+  {id:2,em:"🚗",nm:"Autobahn",ds:"Direkt proportionale Zuordnungen",cl:"#16A34A"},
+  {id:3,em:"⛵",nm:"Hafen",ds:"Indirekt proportionale Zuordnungen",cl:"#0284C7"},
+  {id:4,em:"🏔️",nm:"Gebirge",ds:"Gemischt: direkt vs. indirekt",cl:"#7C3AED"},
+  {id:5,em:"🏖️",nm:"Strand-Ziel",ds:"Dreisatz-Finale",cl:"#0891B2"},
+  {id:6,em:"⭐",nm:"Bonus-Sprint",ds:"Alle Typen, endlos",cl:"#CA8A04"}
+];
+let G={name:"",pts:0,st:[
+  {u:1,d:0,td:0,tt:6,p:0,mp:0},{u:0,d:0,td:0,tt:7,p:0,mp:0},
+  {u:0,d:0,td:0,tt:7,p:0,mp:0},{u:0,d:0,td:0,tt:6,p:0,mp:0},
+  {u:0,d:0,td:0,tt:8,p:0,mp:0},{u:0,d:0,td:0,tt:0,p:0,mp:0}
+],cf:[0,0,0,0,0],cs:-1,ct:0,att:0,lat:0,ans:0};
+let solFn=null;
+function sv(){try{localStorage.setItem('ar_s',JSON.stringify(G))}catch(e){}}
+function ld(){try{const s=localStorage.getItem('ar_s');if(s){Object.assign(G,JSON.parse(s));return 1}}catch(e){}return 0}
+function $(id){return document.getElementById(id)}
+function rI(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function pk(a){return a[Math.floor(Math.random()*a.length)]}
+function r2(n){return Math.round(n*100)/100}
+function pN(s){if(!s)return NaN;return parseFloat(String(s).trim().replace(',','.'))}
+function aE(a,b,t){t=t||0.01;return Math.abs(a-b)<=t+Math.abs(b)*0.005}
+function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+const SM=["Super! 🎉","Richtig! Weiter so! 🚀","Perfekt! 💪","Genau! ⭐","Toll gemacht! 🌟","Klasse! 🎊","Ausgezeichnet! 🏆","Fantastisch! 🔥"];
+function rs(){return pk(SM)}
+function confetti(){const c=['#EF4444','#F59E0B','#22C55E','#3B82F6','#8B5CF6','#EC4899'];for(let i=0;i<30;i++){const d=document.createElement('div');d.className='confetti';d.style.cssText=`left:${rI(5,95)}%;top:-10px;background:${pk(c)};width:${rI(6,12)}px;height:${rI(6,12)}px;border-radius:${rI(0,1)?'50%':'2px'};animation-duration:${1+Math.random()*1.5}s;animation-delay:${Math.random()*.5}s`;document.body.appendChild(d);setTimeout(()=>d.remove(),3000)}}
+function updBar(){$('topPts').textContent=G.pts+' Punkte';let d=0,a=0;for(let i=0;i<5;i++){d+=G.st[i].td;a+=G.st[i].tt}$('pbi').style.width=(a?Math.round(d/a*100):0)+'%'}
+function getStars(p,m){if(!m)return'';const r=p/m*100;return r>=90?'⭐⭐⭐':r>=75?'⭐⭐':r>=60?'⭐':'💪'}
+
+// === GAME FLOW ===
+function startGame(){
+  G.name=$('nameIn').value.trim()||'';
+  $('mapGreet').innerHTML=`Auf geht's${G.name?', '+G.name:''}! 🌍`;
+  $('topBar').classList.remove('hidden');
+  $('topTitle').textContent=G.name?G.name+'s Abenteuerreise':'Die große Abenteuerreise';
+  buildMap();showScr('mapScr');updBar();sv();
+}
+function buildMap(){
+  const g=$('stGrid');g.innerHTML='';
+  STN.forEach((s,i)=>{const st=G.st[i];const c=document.createElement('div');c.className='sc';
+    if(!st.u)c.classList.add('lk');if(st.d)c.classList.add('done');if(st.u&&!st.d)c.classList.add('act');
+    c.style.borderColor=st.u?s.cl:'';
+    c.innerHTML=`<span class="em">${s.em}</span><div class="sn" style="color:${s.cl}">Station ${s.id}: ${s.nm}</div><div class="sd">${s.ds}</div>${!st.u?'<span class="li">🔒</span>':''}${st.d?`<div class="st">${getStars(st.p,st.mp)}</div>`:''}${st.u&&!st.d&&i<5?`<div style="margin-top:8px;font-size:.85rem;color:${s.cl}">Aufgabe ${st.td+1} von ${st.tt}</div>`:''}`;
+    if(st.u)c.onclick=()=>enterSt(i);g.appendChild(c);
+  });
+  let cw='';for(let i=0;i<5;i++){cw+=G.cf[i]?`<span style="color:#DC2626;font-weight:900;">${CWF[i]}</span>`:'<span style="color:#CBD5E1;">_ _</span>';if(i<4)cw+=' '}
+  $('cwProg').innerHTML='🔑 Codewort: '+cw;
+}
+function showMap(){buildMap();showScr('mapScr');updBar()}
+function enterSt(i){G.cs=i;G.ct=G.st[i].td;document.documentElement.style.setProperty('--cur',STN[i].cl);showScr('taskScr');loadTask()}
+function loadTask(){
+  window.scrollTo(0,0);const s=G.cs,t=G.ct,inf=STN[s],st=G.st[s];
+  $('tsl').textContent=`${inf.em} Station ${inf.id}: ${inf.nm}`;$('tsl').style.background=inf.cl;
+  if(s<5&&t>=st.tt){stComplete();return}
+  $('tpt').textContent=`Aufgabe ${t+1} von ${st.tt} ${inf.em}`;
+  $('tpf').style.width=(t/st.tt*100)+'%';$('tpf').style.background=inf.cl;
+  $('nxBtn').classList.add('hidden');$('solBtn').classList.add('hidden');$('mapBtn').classList.add('hidden');
+  G.att=0;G.ans=0;solFn=null;
+  [genS1,genS2,genS3,genS4,genS5,genBonus][s](t);updBar();
+}
+function taskOk(){if(G.ans)return;G.ans=1;const a=G.att===0?3:G.att===1?2:1;G.pts+=a;G.st[G.cs].p+=a;G.st[G.cs].mp+=3;$('nxBtn').classList.remove('hidden');$('solBtn').classList.add('hidden');confetti();sv();updBar()}
+function taskNo(){G.att++;const n=Date.now();if(n-G.lat<3000&&G.att>=3){showTO();return}G.lat=n;if(G.att>=2)$('solBtn').classList.remove('hidden')}
+function showSol(){if(G.ans)return;G.ans=1;G.pts+=1;G.st[G.cs].p+=1;G.st[G.cs].mp+=3;if(solFn)solFn();$('nxBtn').classList.remove('hidden');$('solBtn').classList.add('hidden');sv();updBar()}
+function nxTask(){G.st[G.cs].td++;G.ct++;sv();loadTask()}
+function stComplete(){
+  const s=G.cs,st=G.st[s];st.d=1;G.cf[s]=1;
+  if(s<4)G.st[s+1].u=1;if(s===4)G.st[5].u=1;
+  const inf=STN[s],pct=st.mp?Math.round(st.p/st.mp*100):0;
+  $('tC').innerHTML=`<div class="cwr"><div style="font-size:3rem;">${inf.em} 🎉</div><h2 style="margin:12px 0;">Station ${inf.id} geschafft!</h2><p>${st.p} von ${st.mp} Punkten (${pct}%) ${getStars(st.p,st.mp)}</p><p style="margin-top:16px;font-size:1.1rem;">🔑 Codewort-Fragment freigeschaltet:</p><div class="frag">${CWF[s]}</div>${s<4?`<p style="margin-top:12px;">🔓 Station ${s+2} ist jetzt freigeschaltet!</p>`:''}</div>${allDone()?'<div style="text-align:center;margin-top:16px;"><button class="btn bs" onclick="showCert()" style="font-size:1.2rem;padding:16px 40px;">🌍 Reisepass ansehen!</button></div>':''}`;
+  $('nxBtn').classList.add('hidden');$('mapBtn').classList.remove('hidden');sv();updBar();
+}
+function allDone(){for(let i=0;i<5;i++)if(!G.st[i].d)return 0;return 1}
+function showCert(){
+  let tp=0,tm=0;for(let i=0;i<5;i++){tp+=G.st[i].p;tm+=G.st[i].mp}const pct=tm?Math.round(tp/tm*100):0;
+  let r,rt;if(pct>=90){r='⭐⭐⭐';rt='Sehr gut'}else if(pct>=75){r='⭐⭐';rt='Gut'}else if(pct>=60){r='⭐';rt='Befriedigend'}else{r='💪';rt='Weiter üben!'}
+  $('certC').innerHTML=`<div style="font-size:3rem;">🌍🏆🎓</div><h2>Reisepass</h2><div style="font-size:1.4rem;font-weight:700;color:#6366F1;margin:16px 0;">${G.name||'Abenteurer'}</div><p>hat die große Mathe-Abenteuerreise<br>erfolgreich abgeschlossen!</p><div style="font-size:1.5rem;font-weight:900;letter-spacing:6px;color:#DC2626;margin:16px 0;">${CW}</div><p>Punkte: ${tp} / ${tm} (${pct}%)</p><div style="font-size:2rem;margin:12px 0;">${r}</div><div style="font-size:1.1rem;font-weight:600;">${rt}</div><p style="margin-top:16px;font-size:.8rem;color:var(--txL);">Zuordnungen – direkte und indirekte Proportionalität | Klasse 6</p>`;
+  $('certScr').style.display='flex';showScr('certScr');
+}
+function showTO(){$('toOv').classList.remove('hidden');let s=120;const iv=setInterval(()=>{s--;$('toCD').textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;if(s<=0){clearInterval(iv);$('toOv').classList.add('hidden')}},1000)}
+
+// === HELPERS: check inputs ===
+function chkInps(prefix,fb){
+  if(G.ans)return;let ok=1;
+  document.querySelectorAll(`[id^="${prefix}"]`).forEach(inp=>{
+    const v=pN(inp.value),a=pN(inp.dataset.a);
+    if(aE(v,a)){inp.style.borderColor='#22C55E'}else{inp.style.borderColor='#EF4444';ok=0}
+  });
+  if(ok){$(fb).innerHTML=`<div class="fb s">${rs()}</div>`;taskOk()}
+  else{$(fb).innerHTML=G.att===0?`<div class="fb e">Fast! 🤔 Versuch es nochmal!</div>`:
+    `<div class="fb h">💡 Tipp: Schau dir die bekannten Wertepaare an und berechne den Zusammenhang.</div>`;taskNo()}
+}
+function chkMC(btn,ok){
+  if(G.ans)return;document.querySelectorAll('.mb').forEach(b=>b.classList.add('dis'));
+  if(ok){btn.classList.add('ok');$('fbk').innerHTML=`<div class="fb s">${rs()}</div>`;taskOk()}
+  else{btn.classList.add('no');$('fbk').innerHTML=`<div class="fb e">Leider nicht richtig. 🤔</div>`;
+    setTimeout(()=>document.querySelectorAll('.mb').forEach(b=>{b.classList.remove('dis','no')}),1500);taskNo()}
+}
+function chkVal(id,cor,fb){
+  if(G.ans)return;const v=pN($(id).value);
+  if(aE(v,cor)){$(id).style.borderColor='#22C55E';$(fb).innerHTML=`<div class="fb s">${rs()}</div>`;taskOk()}
+  else{$(id).style.borderColor='#EF4444';$(fb).innerHTML=G.att===0?`<div class="fb e">Fast! 🤔 Versuch es nochmal!</div>`:
+    `<div class="fb h">💡 Tipp: Rechne Schritt für Schritt mit dem Dreisatz.</div>`;taskNo()}
+}
+function chkSels(prefix,fb){
+  if(G.ans)return;let ok=1;
+  document.querySelectorAll(`[id^="${prefix}"]`).forEach(s=>{
+    if(s.value===s.dataset.a){s.classList.add('ok');s.classList.remove('no')}
+    else{s.classList.add('no');s.classList.remove('ok');ok=0}
+  });
+  if(ok){$(fb).innerHTML=`<div class="fb s">${rs()}</div>`;taskOk()}
+  else{$(fb).innerHTML=G.att===0?`<div class="fb e">Fast! 🤔 Versuch es nochmal!</div>`:
+    `<div class="fb h">💡 Denk nochmal genau nach und probiere es erneut.</div>`;taskNo()}
+}
+
+// === SVG HELPERS ===
+function mkSVG(w,h,xM,yM,xL,yL){
+  const p={l:50,r:20,t:20,b:40},iw=w-p.l-p.r,ih=h-p.t-p.b;
+  const sx=x=>p.l+(x/xM)*iw,sy=y=>p.t+ih-(y/yM)*ih;
+  let s=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="background:#FAFAFA;border-radius:12px;">`;
+  for(let i=0;i<=5;i++){const x=p.l+i*(iw/5);s+=`<line x1="${x}" y1="${p.t}" x2="${x}" y2="${p.t+ih}" stroke="#E2E8F0"/><text x="${x}" y="${h-8}" text-anchor="middle" fill="#94A3B8" font-size="11">${r2(xM/5*i)}</text>`}
+  for(let i=0;i<=5;i++){const y=p.t+i*(ih/5);s+=`<line x1="${p.l}" y1="${y}" x2="${p.l+iw}" y2="${y}" stroke="#E2E8F0"/><text x="${p.l-8}" y="${y+4}" text-anchor="end" fill="#94A3B8" font-size="11">${r2(yM-yM/5*i)}</text>`}
+  s+=`<line x1="${p.l}" y1="${p.t}" x2="${p.l}" y2="${p.t+ih}" stroke="#334155" stroke-width="2"/><line x1="${p.l}" y1="${p.t+ih}" x2="${p.l+iw}" y2="${p.t+ih}" stroke="#334155" stroke-width="2"/>`;
+  s+=`<text x="${p.l+iw/2}" y="${h-2}" text-anchor="middle" fill="#334155" font-size="12" font-weight="600">${xL}</text>`;
+  s+=`<text x="14" y="${p.t+ih/2}" text-anchor="middle" fill="#334155" font-size="12" font-weight="600" transform="rotate(-90,14,${p.t+ih/2})">${yL}</text>`;
+  return{s,sx,sy,end:'</svg>',p,iw,ih};
+}
+function svgPts(o,pts,c){let s='';pts.forEach(p=>{s+=`<circle cx="${o.sx(p.x)}" cy="${o.sy(p.y)}" r="5" fill="${c}" stroke="#fff" stroke-width="2"/>`});return s}
+function svgLine(o,pts,c){if(pts.length<2)return'';let d=`M ${o.sx(pts[0].x)} ${o.sy(pts[0].y)}`;for(let i=1;i<pts.length;i++)d+=` L ${o.sx(pts[i].x)} ${o.sy(pts[i].y)}`;return`<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`}
+
+// === RANDOM GENERATORS ===
+const DK=[1.5,2,2.5,3,3.5,4,5,6,7.5,8,10,15];
+const DX=[1,2,3,4,5,6,8,10,12,15,20];
+const IK=[12,18,20,24,30,36,40,48,60,72,100,120,252,300];
+function genDT(nPairs){
+  nPairs=nPairs||5;const k=pk(DK);const pool=DX.filter(x=>{const y=k*x;return y<1000&&(y===Math.round(y)||Math.abs(y-r2(y))<0.001)});
+  const xs=[];while(xs.length<nPairs&&pool.length>xs.length){const x=pk(pool);if(!xs.includes(x))xs.push(x)}
+  xs.sort((a,b)=>a-b);return{k,pairs:xs.map(x=>({x,y:r2(k*x)}))}
+}
+function genIT(nPairs){
+  nPairs=nPairs||5;const k=pk(IK);const divs=[];for(let i=1;i<=k&&i<=30;i++)if(k%i===0)divs.push(i);
+  const xs=[];while(xs.length<nPairs&&divs.length>xs.length){const x=pk(divs);if(!xs.includes(x))xs.push(x)}
+  xs.sort((a,b)=>a-b);return{k,pairs:xs.map(x=>({x,y:k/x}))}
+}
+
+// ============================================================
+// STATION 1: BAHNHOF – Allgemeine Zuordnungen
+// ============================================================
+function genS1(t){[s1_matchGraphs,s1_travelStory,s1_schoolRoute,s1_tempTable,s1_fillContainers,s1_drawFromText][t]()}
+
+function s1_matchGraphs(){
+  // 4 tables, 4 graphs – match them (like Aufgabe 1 from Zuordnungen Niv2)
+  const tables=[
+    {data:[{x:0,y:0},{x:1,y:2},{x:2,y:9},{x:3,y:2},{x:4,y:6}]},
+    {data:[{x:0,y:0},{x:1,y:3},{x:2,y:1},{x:3,y:2.5},{x:4,y:3}]},
+    {data:[{x:0,y:5},{x:1,y:6},{x:2,y:2},{x:3,y:5},{x:4,y:6}]},
+    {data:[{x:0,y:6},{x:1,y:6},{x:2,y:3},{x:3,y:6},{x:4,y:9}]}
+  ];
+  const labels=['A','B','C','D'];
+  // Shuffle graph order
+  const order=[0,1,2,3].sort(()=>Math.random()-.5);
+  const correct={}; // tableIdx -> graphLabel
+  order.forEach((ti,gi)=>{correct[ti]=labels[gi]});
+
+  let graphsHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;">';
+  order.forEach((ti,gi)=>{
+    const pts=tables[ti].data;const xM=5,yM=Math.max(...pts.map(p=>p.y))+2;
+    const o=mkSVG(220,160,xM,yM,'Zeit','Anzahl');
+    let svg=o.s+svgLine(o,pts,'#DC2626')+svgPts(o,pts,'#DC2626')+o.end;
+    graphsHTML+=`<div style="text-align:center;background:#F8FAFC;border-radius:12px;padding:8px;"><div style="font-weight:700;margin-bottom:4px;">Graph ${labels[gi]}</div>${svg}</div>`;
+  });
+  graphsHTML+='</div>';
+
+  let tablesHTML='';
+  tables.forEach((t,i)=>{
+    tablesHTML+=`<div style="margin:8px 0;"><span style="font-weight:700;">Tabelle ${i+1}:</span>
+    <table class="vt" style="display:inline-table;margin-left:8px;"><tr><th>Zeit</th>${t.data.map(p=>`<td>${p.x}</td>`).join('')}</tr><tr><th>Anzahl</th>${t.data.map(p=>`<td>${p.y}</td>`).join('')}</tr></table>
+    → Graph: <select class="gs" id="s1m_${i}" data-a="${correct[i]}"><option value="">?</option>${labels.map(l=>`<option value="${l}">${l}</option>`).join('')}</select></div>`;
+  });
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🚂 <strong>Ordne jeder Wertetabelle den richtigen Graphen zu.</strong></div>${graphsHTML}${tablesHTML}<div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkSels('s1m_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{tables.forEach((t,i)=>{$('s1m_'+i).value=correct[i];$('s1m_'+i).classList.add('ok')})};
+}
+
+function s1_travelStory(){
+  // "Kim forgot passport" story – match to correct diagram (like Aufgabe 2)
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🚂 Kim erzählt: <em>„Ich hatte die Hälfte des Weges zum Flughafen (F) mit dem Bus zurückgelegt, als ich merkte, dass ich meinen Pass vergessen habe. Daraufhin habe ich ein Taxi zurück nach Hause (H) genommen und den Pass gesucht. Als ich ihn gefunden hatte, bin ich mit dem Taxi schnell zum Flughafen gefahren."</em><br><br><strong>Welches Strecke-Zeit-Diagramm beschreibt Kims Weg?</strong></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+    <button class="mb" onclick="chkMC(this,false)" style="text-align:center;padding:16px;">
+      <div style="font-weight:700;">Diagramm 1</div>
+      <svg width="160" height="120" viewBox="0 0 160 120" style="background:#F8FAFC;border-radius:8px;">
+        <text x="5" y="15" font-size="10" fill="#334155">F</text><text x="5" y="110" font-size="10" fill="#334155">H</text>
+        <line x1="20" y1="110" x2="140" y2="110" stroke="#CBD5E1"/><line x1="20" y1="10" x2="20" y2="110" stroke="#CBD5E1"/>
+        <polyline points="20,110 60,60 80,60 100,110 110,110 140,10" fill="none" stroke="#DC2626" stroke-width="2.5"/>
+      </svg>
+    </button>
+    <button class="mb" onclick="chkMC(this,true)" style="text-align:center;padding:16px;">
+      <div style="font-weight:700;">Diagramm 2</div>
+      <svg width="160" height="120" viewBox="0 0 160 120" style="background:#F8FAFC;border-radius:8px;">
+        <text x="5" y="15" font-size="10" fill="#334155">F</text><text x="5" y="110" font-size="10" fill="#334155">H</text>
+        <line x1="20" y1="110" x2="140" y2="110" stroke="#CBD5E1"/><line x1="20" y1="10" x2="20" y2="110" stroke="#CBD5E1"/>
+        <polyline points="20,110 55,60 75,110 85,110 140,10" fill="none" stroke="#DC2626" stroke-width="2.5"/>
+      </svg>
+    </button>
+    <button class="mb" onclick="chkMC(this,false)" style="text-align:center;padding:16px;">
+      <div style="font-weight:700;">Diagramm 3</div>
+      <svg width="160" height="120" viewBox="0 0 160 120" style="background:#F8FAFC;border-radius:8px;">
+        <text x="5" y="15" font-size="10" fill="#334155">F</text><text x="5" y="110" font-size="10" fill="#334155">H</text>
+        <line x1="20" y1="110" x2="140" y2="110" stroke="#CBD5E1"/><line x1="20" y1="10" x2="20" y2="110" stroke="#CBD5E1"/>
+        <polyline points="20,110 70,10 90,10 140,110" fill="none" stroke="#DC2626" stroke-width="2.5"/>
+      </svg>
+    </button>
+  </div><div id="fbk"></div></div>`;
+  solFn=()=>{$('fbk').innerHTML=`<div class="sol"><span class="lb">Lösung:</span> Diagramm 2 ist richtig. Kim fährt erst halb zum Flughafen (Strecke steigt), fährt zurück nach Hause (Strecke sinkt auf H), wartet kurz (waagerecht), fährt dann schnell zum Flughafen (steile Linie nach F).</div>`};
+}
+
+function s1_schoolRoute(){
+  // Schulweg diagram gap-fill (like Aufgabe 3)
+  const jorge_start=pk(['7:15','7:20','7:25']);
+  const wendy_name='Wendy';
+  const wendy_return=pk(['7:35','7:40']);
+  const philipp_start=pk(['7:30','7:35']);
+  const philipp_return2=pk(['7:45','7:50']);
+  const late_min=pk([5,8,10]);
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🚂 Das Diagramm beschreibt den morgendlichen Schulweg von drei Schülern: Jorge, Wendy und Philipp. <strong>Vervollständige den Lückentext.</strong></div>
+  <div class="qbox" style="line-height:2.2;">
+    Jorge läuft um <select class="gs" id="s1r_0" data-a="${jorge_start}"><option value="">?</option><option value="7:15">7:15</option><option value="7:20">7:20</option><option value="7:25">7:25</option><option value="7:30">7:30</option></select> Uhr von zuhause los.
+    <select class="gs" id="s1r_1" data-a="${wendy_name}"><option value="">?</option><option value="Jorge">Jorge</option><option value="Wendy">Wendy</option><option value="Philipp">Philipp</option></select> wohnt am nächsten an der Schule, kehrt um
+    <select class="gs" id="s1r_2" data-a="${wendy_return}"><option value="">?</option><option value="7:30">7:30</option><option value="7:35">7:35</option><option value="7:40">7:40</option><option value="7:45">7:45</option></select> Uhr jedoch noch einmal kurz nach Hause zurück. Philipp läuft erst um
+    <select class="gs" id="s1r_3" data-a="${philipp_start}"><option value="">?</option><option value="7:25">7:25</option><option value="7:30">7:30</option><option value="7:35">7:35</option><option value="7:40">7:40</option></select> Uhr los. Auch er läuft nochmal nach Hause und nimmt dann den Bus. Trotzdem kommt er
+    <select class="gs" id="s1r_4" data-a="${late_min}"><option value="">?</option><option value="5">5</option><option value="8">8</option><option value="10">10</option><option value="15">15</option></select> Minuten zu spät.
+  </div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkSels('s1r_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{for(let i=0;i<5;i++){const el=$('s1r_'+i);el.value=el.dataset.a;el.classList.add('ok')}};
+}
+
+function s1_tempTable(){
+  // Monthly temperatures – identify warmest/coldest (like Aufgabe 4)
+  const months=['J','F','M','A','M','J','J','A','S','O','N','D'];
+  const monthsFull=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const temps=[rI(-2,2),rI(1,4),rI(3,7),rI(7,11),rI(12,16),rI(18,22),rI(21,25),rI(19,23),rI(14,18),rI(8,12),rI(4,8),rI(1,4)];
+  const maxT=Math.max(...temps),minT=Math.min(...temps);
+  const warmIdx=temps.indexOf(maxT),coldIdx=temps.indexOf(minT);
+
+  let tbl=`<table class="vt"><tr><th>Monat</th>${months.map(m=>`<th>${m}</th>`).join('')}</tr><tr><th>Temp. °C</th>${temps.map(t=>`<td>${t}</td>`).join('')}</tr></table>`;
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🚂 In der Wertetabelle sind die monatlichen Durchschnittstemperaturen in Berlin aufgeführt.</div>${tbl}
+  <p style="margin:12px 0;"><strong>a)</strong> Wann war es am wärmsten?
+    <select class="gs" id="s1t_0" data-a="${monthsFull[warmIdx]}"><option value="">?</option>${monthsFull.map(m=>`<option value="${m}">${m}</option>`).join('')}</select></p>
+  <p style="margin:12px 0;"><strong>b)</strong> Wann war es am kältesten?
+    <select class="gs" id="s1t_1" data-a="${monthsFull[coldIdx]}"><option value="">?</option>${monthsFull.map(m=>`<option value="${m}">${m}</option>`).join('')}</select></p>
+  <p style="margin:12px 0;"><strong>c)</strong> Wie groß ist der Temperaturunterschied zwischen wärmstem und kältestem Monat?
+    <input class="ni" id="s1t_2" data-a="${maxT-minT}"> °C</p>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="s1_chkTemp()">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s1t_0').value=monthsFull[warmIdx];$('s1t_1').value=monthsFull[coldIdx];$('s1t_2').value=maxT-minT;$('fbk').innerHTML=`<div class="sol">Wärmster: ${monthsFull[warmIdx]} (${maxT}°C), Kältester: ${monthsFull[coldIdx]} (${minT}°C), Unterschied: ${maxT-minT}°C</div>`};
+}
+function s1_chkTemp(){
+  if(G.ans)return;let ok=1;
+  ['s1t_0','s1t_1'].forEach(id=>{const el=$(id);if(el.value===el.dataset.a){el.classList.add('ok');el.classList.remove('no')}else{el.classList.add('no');ok=0}});
+  const v=pN($('s1t_2').value),a=pN($('s1t_2').dataset.a);
+  if(aE(v,a))$('s1t_2').style.borderColor='#22C55E';else{$('s1t_2').style.borderColor='#EF4444';ok=0}
+  if(ok){$('fbk').innerHTML=`<div class="fb s">${rs()}</div>`;taskOk()}
+  else{$('fbk').innerHTML=G.att===0?`<div class="fb e">Fast! 🤔</div>`:`<div class="fb h">💡 Suche den höchsten und niedrigsten Wert in der Tabelle.</div>`;taskNo()}
+}
+
+function s1_fillContainers(){
+  // 5 containers → 5 fill graphs (like Aufgabe 5)
+  const shapes=[
+    {nm:'Zylinder (gleichmäßig breit)',svg:'<rect x="25" y="5" width="50" height="90" rx="3" fill="none" stroke="#334155" stroke-width="2.5"/>',graph:'linear',gSvg:'<line x1="10" y1="95" x2="95" y2="10" stroke="#DC2626" stroke-width="2.5"/>'},
+    {nm:'Oben breiter (Kegel)',svg:'<path d="M35 95 L20 5 L80 5 L65 95 Z" fill="none" stroke="#334155" stroke-width="2.5"/>',graph:'decel',gSvg:'<path d="M10 95 Q60 30 95 10" fill="none" stroke="#16A34A" stroke-width="2.5"/>'},
+    {nm:'Oben enger (Trichter)',svg:'<path d="M15 95 L40 5 L60 5 L85 95 Z" fill="none" stroke="#334155" stroke-width="2.5"/>',graph:'accel',gSvg:'<path d="M10 95 Q40 85 95 10" fill="none" stroke="#0284C7" stroke-width="2.5"/>'},
+    {nm:'Kugel (Mitte breit)',svg:'<ellipse cx="50" cy="50" rx="35" ry="45" fill="none" stroke="#334155" stroke-width="2.5"/>',graph:'sigmoid',gSvg:'<path d="M10 95 Q30 85 50 50 Q70 15 95 10" fill="none" stroke="#7C3AED" stroke-width="2.5"/>'},
+    {nm:'Flasche (eng-breit-eng)',svg:'<path d="M35 95 L25 60 L25 40 L38 20 L38 5 L62 5 L62 20 L75 40 L75 60 L65 95 Z" fill="none" stroke="#334155" stroke-width="2.5"/>',graph:'knick',gSvg:'<path d="M10 95 L30 70 Q50 50 60 40 L95 10" fill="none" stroke="#0891B2" stroke-width="2.5"/>'}
+  ];
+  const shuf=shapes.sort(()=>Math.random()-.5).slice(0,4);
+  const gLabels=['1','2','3','4'];
+  const gOrder=[...shuf].sort(()=>Math.random()-.5);
+
+  let html=`<div class="tc"><div class="intro">🚂 Die gezeigten Behälter werden gleichmäßig mit Wasser befüllt. <strong>Ordne jedem Behälter den passenden Füllhöhe-Zeit-Graphen zu.</strong></div>`;
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0;">';
+  shuf.forEach((s,i)=>{
+    html+=`<div style="text-align:center;"><svg width="100" height="100" viewBox="0 0 100 100" style="background:#F8FAFC;border-radius:8px;">${s.svg}</svg><div style="font-weight:600;font-size:.85rem;">Behälter ${String.fromCharCode(65+i)}</div>
+    <select class="gs" id="s1f_${i}" data-a="${gLabels[gOrder.indexOf(s)]}" style="margin-top:4px;"><option value="">?</option>${gLabels.map(l=>`<option value="${l}">${l}</option>`).join('')}</select></div>`;
+  });
+  html+='</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0;">';
+  gOrder.forEach((s,i)=>{
+    html+=`<div style="text-align:center;"><svg width="100" height="100" viewBox="0 0 100 100" style="background:#F8FAFC;border-radius:8px;">
+    <line x1="10" y1="95" x2="10" y2="5" stroke="#334155" stroke-width="1.5"/><line x1="10" y1="95" x2="95" y2="95" stroke="#334155" stroke-width="1.5"/>
+    <text x="5" y="12" font-size="8" fill="#64748B">h</text><text x="85" y="104" font-size="8" fill="#64748B">t</text>
+    ${s.gSvg}</svg><div style="font-weight:600;">Graph ${gLabels[i]}</div></div>`;
+  });
+  html+=`</div><div style="text-align:center;"><button class="btn bst" style="background:var(--cur)" onclick="chkSels('s1f_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{shuf.forEach((s,i)=>{const el=$('s1f_'+i);el.value=el.dataset.a;el.classList.add('ok')});$('fbk').innerHTML=`<div class="sol">Ein gleichmäßig breiter Behälter → linearer Graph. Oben breiter → Graph wird flacher. Oben enger → Graph wird steiler.</div>`};
+}
+
+function s1_drawFromText(){
+  // Speed calculation from distance-time (like Aufgabe 3d from Zuordnungen)
+  const dist=pk([1500,2000,2400,2500,3000]);
+  const time_min=pk([20,25,30]);
+  const speed_m_per_min=dist/time_min;
+  const speed_km_h=r2(speed_m_per_min*60/1000);
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🚂 Ein Schulbus legt eine Strecke von <strong>${dist} m</strong> in <strong>${time_min} Minuten</strong> zurück.</div>
+  <p style="margin:8px 0;"><strong>a)</strong> Berechne die Geschwindigkeit in m/min.</p>
+  <div class="row"><span>${dist} m ÷ ${time_min} min =</span><input class="ni" id="s1d_0" data-a="${speed_m_per_min}"><span>m/min</span></div>
+  <p style="margin:8px 0;"><strong>b)</strong> Rechne die Geschwindigkeit in km/h um.</p>
+  <div class="row"><input class="ni" id="s1d_1" data-a="${speed_km_h}"><span>km/h</span></div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s1d_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s1d_0').value=speed_m_per_min;$('s1d_1').value=speed_km_h;$('fbk').innerHTML=`<div class="sol"><span class="lb">Lösung:</span> a) ${dist} ÷ ${time_min} = ${speed_m_per_min} m/min. b) ${speed_m_per_min} · 60 ÷ 1000 = ${speed_km_h} km/h</div>`};
+}
+
+// ============================================================
+// STATION 2: AUTOBAHN – Direkt proportionale Zuordnungen
+// ============================================================
+function genS2(t){[s2_tables,s2_waterDrip,s2_dreisatzBroetchen,s2_priceCompare,s2_jeMehr,s2_propOderNicht,s2_dreisatzHard][t]()}
+
+function s2_tables(){
+  // 3 proportional tables to complete (like Aufgabe 1 from Prop Niv2)
+  const t1={k:3.75,pairs:[{x:2,y:7.5},{x:4,y:null},{x:6,y:null}]};
+  const t2={k:0.075,pairs:[{x:4,y:0.3},{x:2,y:null},{x:12,y:null}]};
+  const t3={k:r2(1/18),pairs:[{x:6,y:r2(6/18)},{x:12,y:null},{x:3,y:null}]};
+  // Use simpler: generate random
+  const d1=genDT(4),d2=genDT(4),d3=genDT(4);
+  const tabs=[d1,d2,d3];let idx=0;
+  let html=`<div class="tc"><div class="intro">🚗 Bei den folgenden Wertetabellen handelt es sich um <strong>direkt proportionale Zuordnungen</strong>. Vervollständige die Tabellen.</div>`;
+  tabs.forEach((d,ti)=>{
+    const hide=[rI(1,2),rI(2,3)].filter((v,i,a)=>a.indexOf(v)===i);if(hide.length<2)hide.push(hide[0]===1?3:1);
+    html+=`<p style="font-weight:700;margin-top:12px;">${String.fromCharCode(97+ti)})</p><table class="vt"><tr><th>Wert 1</th>${d.pairs.map(p=>`<td>${p.x}</td>`).join('')}</tr><tr><th>Wert 2</th>`;
+    d.pairs.forEach((p,i)=>{
+      if(hide.includes(i)){html+=`<td><input class="ni" id="s2t_${idx}" data-a="${p.y}"></td>`;idx++}
+      else html+=`<td>${p.y}</td>`;
+    });
+    html+=`</tr></table>`;
+  });
+  html+=`<div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s2t_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{for(let i=0;i<idx;i++){const el=$('s2t_'+i);el.value=el.dataset.a;el.style.borderColor='#22C55E'}};
+}
+
+function s2_waterDrip(){
+  // Water dripping context + table (like Aufgabe 2)
+  const ml_per_2min=pk([30,40,50,60]);
+  const k=ml_per_2min/2;
+  const times=[2,4,6,8,10];
+  const vals=times.map(t=>t*k);
+
+  let html=`<div class="tc"><div class="intro">🚗 Amelie hat den Wasserhahn nicht ganz zugedreht. Dadurch tropfen in <strong>2 Minuten ${ml_per_2min} ml</strong> Wasser. <strong>Fülle die Wertetabelle aus.</strong></div>
+  <table class="vt"><tr><th>Zeit (min)</th>${times.map(t=>`<td>${t}</td>`).join('')}</tr><tr><th>Wasser (ml)</th>`;
+  times.forEach((t,i)=>{
+    if(i===0)html+=`<td>${vals[i]}</td>`;
+    else html+=`<td><input class="ni" id="s2w_${i}" data-a="${vals[i]}"></td>`;
+  });
+  html+=`</tr></table>
+  <p style="margin:8px 0;font-size:.9rem;color:var(--txL);">Tipp: Berechne zuerst, wie viel Wasser pro Minute tropft (k = ${ml_per_2min} ÷ 2).</p>
+  <div style="text-align:center;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s2w_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{for(let i=1;i<5;i++){$('s2w_'+i).value=vals[i];$('s2w_'+i).style.borderColor='#22C55E'}$('fbk').innerHTML=`<div class="sol">k = ${ml_per_2min} ÷ 2 = ${k} ml/min. Werte: ${vals.join(', ')}</div>`};
+}
+
+function s2_dreisatzBroetchen(){
+  // Dreisatz step by step (like Aufgabe 3: Brötchen)
+  const n1=pk([2,3,4,5]);const price=r2(n1*pk([0.35,0.40,0.45,0.50,0.55,0.60]));
+  const priceOne=r2(price/n1);
+  const n2=pk([6,7,8,9,10,12].filter(x=>x!==n1));const n3=pk([15,18,20,24].filter(x=>x!==n1&&x!==n2));
+  const p2=r2(priceOne*n2),p3=r2(priceOne*n3);
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🚗 <strong>Dreisatz bei direkter Proportionalität</strong><br>Ayca hat für <strong>${n1} Brötchen ${price.toFixed(2)} €</strong> bezahlt. Bestimme den Preis für ${n2} und ${n3} Brötchen.</div>
+  <div class="stepbox"><div class="steplabel">Schritt 1: Preis für 1 Brötchen</div>
+  <div class="row"><span>${price.toFixed(2)} € ÷ ${n1} =</span><input class="ni" id="s2b_0" data-a="${priceOne}"><span>€</span></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 2: Preis für ${n2} Brötchen</div>
+  <div class="row"><input class="ni" id="s2b_1" data-a="${p2}"><span>€</span></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 3: Preis für ${n3} Brötchen</div>
+  <div class="row"><input class="ni" id="s2b_2" data-a="${p3}"><span>€</span></div></div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s2b_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s2b_0').value=priceOne;$('s2b_1').value=p2;$('s2b_2').value=p3;$('fbk').innerHTML=`<div class="sol">1 Brötchen: ${priceOne} €, ${n2}: ${p2} €, ${n3}: ${p3} €</div>`};
+}
+
+function s2_priceCompare(){
+  // Compare two packages (like Aufgabe 4: Äpfel)
+  const item=pk(['Äpfel','Orangen','Kartoffeln','Birnen']);
+  const kg1=pk([2,3,4]),p1=r2(kg1*pk([2.50,2.90,3.20]));
+  const kg2=pk([5,6,8]),p2=r2(kg2*pk([2.30,2.60,3.00]));
+  const ppk1=r2(p1/kg1),ppk2=r2(p2/kg2);
+  const cheaper=ppk1<ppk2?1:ppk1>ppk2?2:(ppk1===ppk2?0:1);
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🚗 <strong>Preisvergleich mit Dreisatz:</strong><br>Ein <strong>${kg1}-kg-Sack ${item}</strong> kostet <strong>${p1.toFixed(2)} €</strong>, ein <strong>${kg2}-kg-Sack</strong> kostet <strong>${p2.toFixed(2)} €</strong>. Welche Packungsgröße lohnt sich mehr?</div>
+  <div class="stepbox"><div class="steplabel">Preis pro kg beim ${kg1}-kg-Sack:</div>
+  <div class="row"><span>${p1.toFixed(2)} € ÷ ${kg1} kg =</span><input class="ni" id="s2p_0" data-a="${ppk1}"><span>€/kg</span></div></div>
+  <div class="stepbox"><div class="steplabel">Preis pro kg beim ${kg2}-kg-Sack:</div>
+  <div class="row"><span>${p2.toFixed(2)} € ÷ ${kg2} kg =</span><input class="ni" id="s2p_1" data-a="${ppk2}"><span>€/kg</span></div></div>
+  <p style="margin:12px 0;font-weight:700;">Welcher Sack lohnt sich mehr?</p>
+  <div class="mo"><button class="mb" onclick="chkMC(this,${cheaper===1})">${kg1}-kg-Sack (${p1.toFixed(2)} €)</button><button class="mb" onclick="chkMC(this,${cheaper===2})">${kg2}-kg-Sack (${p2.toFixed(2)} €)</button></div>
+  <div id="fbk"></div></div>`;
+  solFn=()=>{$('s2p_0').value=ppk1;$('s2p_1').value=ppk2;$('fbk').innerHTML=`<div class="sol">${kg1} kg: ${ppk1} €/kg, ${kg2} kg: ${ppk2} €/kg → Der ${cheaper===1?kg1:kg2}-kg-Sack ist günstiger pro kg.</div>`};
+}
+
+function s2_jeMehr(){
+  // "Je mehr/weniger" (like Aufgabe 6 from Prop Niv2)
+  const stmts=[
+    {t:'Je weniger Tickets verkauft werden, desto _____ Einnahmen werden erzielt.',a:'weniger'},
+    {t:'Je mehr Bananen du kaufst, desto _____ musst du bezahlen.',a:'mehr'},
+    {t:'Je weniger Nachhilfestunden du gibst, desto _____ Geld bekommst du.',a:'weniger'},
+    {t:'Je mehr Kühe du hast, desto _____ Futter brauchst du.',a:'mehr'},
+    {t:'Je weniger gedruckt wird, desto _____ Tinte wird verbraucht.',a:'weniger'},
+  ];
+  let html=`<div class="tc"><div class="intro">🚗 Für direkt proportionale Zuordnungen gilt: <strong>Je mehr, desto mehr</strong> bzw. <strong>je weniger, desto weniger</strong>. Setze „mehr" oder „weniger" ein.</div>`;
+  stmts.forEach((s,i)=>{const pts=s.t.split('_____');
+    html+=`<p style="margin:10px 0;line-height:1.8;">${pts[0]}<select class="gs" id="s2j_${i}" data-a="${s.a}"><option value="">?</option><option value="mehr">mehr</option><option value="weniger">weniger</option></select>${pts[1]}</p>`;
+  });
+  html+=`<div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkSels('s2j_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{stmts.forEach((s,i)=>{$('s2j_'+i).value=s.a;$('s2j_'+i).classList.add('ok')})};
+}
+
+function s2_propOderNicht(){
+  // "Proportional oder nicht?" (like Aufgabe 7 from Prop Niv2) – 5 scenarios
+  const scenarios=[
+    {t:'Jakobs Wohnung kostet 9 € pro m². Die Wohnfläche beträgt 80 m². Wie hoch ist seine Miete?',a:'prop',why:'Preis pro m² ist konstant → direkt proportional'},
+    {t:'6 Drucker benötigen 10 Min für 2000 Seiten. Wie lange benötigen 3 Drucker?',a:'nicht',why:'Mehr Drucker → weniger Zeit → indirekt proportional, nicht direkt'},
+    {t:'Kartoffeln kosten 2 € pro kg. Juri kauft 6 kg. Wie viel muss er bezahlen?',a:'prop',why:'Preis pro kg konstant → direkt proportional'},
+    {t:'Eine Hose kostet 40 €. Auf jede 3. Hose gibt es 20 € Rabatt. Was kosten 7 Hosen?',a:'nicht',why:'Durch den Rabatt auf jede 3. Hose ist der Preis pro Hose nicht konstant'},
+    {t:'Zwei Maler benötigen 8 Stunden für eine Wand. Wie lange brauchen 4 Maler?',a:'nicht',why:'Mehr Maler → weniger Zeit → indirekt proportional'},
+  ];
+  let cur=0,correct=0;
+  function renderQ(){
+    if(cur>=scenarios.length){
+      if(correct>=4){$('fbk').innerHTML=`<div class="fb s">${correct}/5 richtig! ${rs()}</div>`;taskOk()}
+      else{$('fbk').innerHTML=`<div class="fb h">${correct}/5 richtig.</div>`;G.ans=1;G.pts+=1;G.st[G.cs].p+=1;G.st[G.cs].mp+=3;$('nxBtn').classList.remove('hidden');sv();updBar()}
+      return;
+    }
+    const q=scenarios[cur];
+    $('tC').innerHTML=`<div class="tc"><div class="intro">🚗 <strong>Direkt proportional oder nicht?</strong> (${cur+1}/5)</div>
+    <div class="qbox">${q.t}</div>
+    <div class="mo" style="justify-content:center;"><button class="mb" style="max-width:250px;" onclick="s2pon('prop')">✅ Direkt proportional</button><button class="mb" style="max-width:250px;" onclick="s2pon('nicht')">❌ Nicht direkt proportional</button></div><div id="fbk"></div></div>`;
+  }
+  window.s2pon=function(ans){
+    const q=scenarios[cur];document.querySelectorAll('.mb').forEach(b=>b.classList.add('dis'));
+    if(ans===q.a){correct++;$('fbk').innerHTML=`<div class="fb s">Richtig! ${q.why}</div>`}
+    else{$('fbk').innerHTML=`<div class="fb e">${q.why}</div>`}
+    cur++;setTimeout(renderQ,2000);
+  };
+  renderQ();
+  solFn=()=>{$('tC').innerHTML=`<div class="tc"><div class="sol">${scenarios.map(s=>`<p><strong>${s.t}</strong><br>→ ${s.a==='prop'?'Direkt proportional':'Nicht direkt proportional'}: ${s.why}</p>`).join('')}</div></div>`};
+}
+
+function s2_dreisatzHard(){
+  // SpaceRun-style: direct proportional with units (like SpaceRun tasks)
+  const tasks=[
+    ()=>{const n=pk([5,8,10]);const w=n*pk([150,200,250]);const n2=pk([3,6,12].filter(x=>x!==n));return{q:`${n} Glühbirnen verbrauchen ${w} Watt. Wie viel verbrauchen ${n2} Glühbirnen?`,a:r2(w/n*n2),u:'Watt',s:`${w} ÷ ${n} = ${r2(w/n)} Watt pro Birne, · ${n2} = ${r2(w/n*n2)} Watt`}},
+    ()=>{const n=pk([6,8,10,14]);const p=r2(n*pk([7,8,9]));const n2=pk([2,3,4,5].filter(x=>x!==n));return{q:`${n} T-Shirts kosten ${p} €. Wie viel kosten ${n2} T-Shirts?`,a:r2(p/n*n2),u:'€',s:`${p} ÷ ${n} = ${r2(p/n)} € pro Stück, · ${n2} = ${r2(p/n*n2)} €`}},
+    ()=>{const g=pk([200,250,300,500]);const p=r2(g/100*pk([1.20,1.50,2.00]));const g2=pk([1000]);return{q:`${g} g Nüsse kosten ${p.toFixed(2)} €. Wie viel kosten 1 kg?`,a:r2(p/g*g2),u:'€',s:`${p.toFixed(2)} ÷ ${g} · 1000 = ${r2(p/g*1000)} €`}},
+    ()=>{const n=pk([10,12,15]);const w=r2(n*pk([0.10,0.12,0.15]));return{q:`${n} Äpfel wiegen ${w} kg. Wie viel Gramm wiegt 1 Apfel?`,a:r2(w/n*1000),u:'g',s:`${w} kg ÷ ${n} = ${r2(w/n)} kg = ${r2(w/n*1000)} g`}},
+  ];
+  const t=pk(tasks)();
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🚗 <strong>Dreisatz-Aufgabe (Niveau 3):</strong></div><div class="qbox">${t.q}</div>
+  <div class="row" style="justify-content:center;margin:16px 0;"><span>Ergebnis:</span><input class="ni" id="s2h_0" data-a="${t.a}"><span>${t.u}</span></div>
+  <div style="text-align:center;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s2h_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s2h_0').value=t.a;$('fbk').innerHTML=`<div class="sol"><span class="lb">Lösung:</span> ${t.s}</div>`};
+}
+
+// ============================================================
+// STATION 3: HAFEN – Indirekt proportionale Zuordnungen
+// ============================================================
+function genS3(t){[s3_tables,s3_seilContext,s3_pumpen,s3_dreisatzStep,s3_jeMehr,s3_indirOderNicht,s3_dreisatzHard][t]()}
+
+function s3_tables(){
+  // 3 antiproportional tables (like Aufgabe 1 from Antiprop Niv2)
+  const d1=genIT(3),d2=genIT(3),d3=genIT(3);
+  const tabs=[d1,d2,d3];let idx=0;
+  let html=`<div class="tc"><div class="intro">⛵ Bei den folgenden Wertetabellen handelt es sich um <strong>indirekt proportionale Zuordnungen</strong>. Vervollständige die Tabellen.</div>`;
+  tabs.forEach((d,ti)=>{
+    const hide=[1,2];
+    html+=`<p style="font-weight:700;margin-top:12px;">${String.fromCharCode(97+ti)}) <span style="font-weight:400;font-size:.9rem;color:var(--txL);">(k = x · y = ${d.k})</span></p><table class="vt"><tr><th>Wert 1</th>${d.pairs.map(p=>`<td>${p.x}</td>`).join('')}</tr><tr><th>Wert 2</th>`;
+    d.pairs.forEach((p,i)=>{
+      if(hide.includes(i)){html+=`<td><input class="ni" id="s3t_${idx}" data-a="${p.y}"></td>`;idx++}
+      else html+=`<td>${p.y}</td>`;
+    });
+    html+=`</tr></table>`;
+  });
+  html+=`<p style="margin-top:12px;font-size:.9rem;color:var(--txL);">Tipp: Bei indirekter Proportionalität gilt x · y = k (konstantes Produkt).</p>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s3t_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{for(let i=0;i<idx;i++){const el=$('s3t_'+i);el.value=el.dataset.a;el.style.borderColor='#22C55E'}};
+}
+
+function s3_seilContext(){
+  // Rope cutting context + table + draw (like Aufgabe 2)
+  const totalLength=pk([12,15,18,20,24,30]);
+  const cuts=[1,2,3,4,6].filter(c=>totalLength%c===0);
+  let html=`<div class="tc"><div class="intro">⛵ Jenny zerschneidet ein <strong>${totalLength} Meter</strong> langes Seil in gleichgroße Stücke. <strong>Bestimme die Länge der Stücke.</strong></div>
+  <table class="vt"><tr><th>Anzahl Stücke</th>${cuts.map(c=>`<td>${c}</td>`).join('')}</tr><tr><th>Länge (m)</th>`;
+  cuts.forEach((c,i)=>{
+    if(i===0)html+=`<td>${totalLength/c}</td>`;
+    else html+=`<td><input class="ni" id="s3s_${i}" data-a="${totalLength/c}"></td>`;
+  });
+  html+=`</tr></table><div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s3s_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{cuts.forEach((c,i)=>{if(i>0){$('s3s_'+i).value=totalLength/c;$('s3s_'+i).style.borderColor='#22C55E'}});$('fbk').innerHTML=`<div class="sol">k = ${totalLength}. Werte: ${cuts.map(c=>totalLength/c).join(', ')}</div>`};
+}
+
+function s3_pumpen(){
+  // Pumpen context with many values (like Aufgabe 4)
+  const basePumps=pk([4,5,6]);const baseTime=pk([40,50,60]);
+  const k=basePumps*baseTime;
+  const pumps=[1,2,3,basePumps,8,10,15].filter(p=>p<=20);
+  let html=`<div class="tc"><div class="intro">⛵ <strong>${basePumps} Pumpen</strong> fördern 1000 Liter Wasser in <strong>${baseTime} Minuten</strong>. Bestimme, wie lange die angegebenen Pumpenanzahlen benötigen.</div>
+  <table class="vt"><tr><th>Pumpen</th>${pumps.map(p=>`<td>${p}</td>`).join('')}</tr><tr><th>Zeit (min)</th>`;
+  pumps.forEach((p,i)=>{
+    if(p===basePumps)html+=`<td>${baseTime}</td>`;
+    else html+=`<td><input class="ni" id="s3p_${i}" data-a="${r2(k/p)}"></td>`;
+  });
+  html+=`</tr></table><div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s3p_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{pumps.forEach((p,i)=>{if(p!==basePumps){$('s3p_'+i).value=r2(k/p);$('s3p_'+i).style.borderColor='#22C55E'}})};
+}
+
+function s3_dreisatzStep(){
+  // Apfelstrudel / Preis / Gruppen context (like Aufgabe 3,5,6)
+  const ctxs=[
+    ()=>{const n=pk([16,20,24]);const w=pk([8,10,12]);const k=n*w;const n2=pk([10,12,15,18].filter(x=>x!==n));return{q:`Ein Apfelstrudel wird in ${n} Stücke mit einer Breite von jeweils ${w} cm geschnitten. Wie breit sind die Stücke, wenn der Strudel in ${n2} Stücke geschnitten wird?`,s1q:`Gesamtlänge = ${n} · ${w} =`,s1a:k,s2q:`Breite pro Stück = ${k} ÷ ${n2} =`,s2a:r2(k/n2),u:'cm'}},
+    ()=>{const n=pk([15,20,25]);const e=pk([6000,8500,10000]);const k=n*e;const target=pk([5000,12500,15000,21250].filter(x=>x!==e));return{q:`Ein Preis wird unter ${n} Gewinnern aufgeteilt. Jeder erhält ${e} €. Bei wie vielen Gewinnern erhält jeder ${target} €?`,s1q:`Gesamtpreis = ${n} · ${e} =`,s1a:k,s2q:`Gewinner = ${k} ÷ ${target} =`,s2a:r2(k/target),u:'Gewinner'}},
+    ()=>{const n=pk([32,36,40,48]);const d=pk([12,15,18,20]);const k=n*d;const n2=pk([24,30,45,60].filter(x=>x!==n));return{q:`Der Lebensmittelvorrat reicht bei ${n} Personen für ${d} Tage. Wie lange reicht er bei ${n2} Personen?`,s1q:`Gesamtvorrat (Personentage) = ${n} · ${d} =`,s1a:k,s2q:`Tage bei ${n2} Personen = ${k} ÷ ${n2} =`,s2a:r2(k/n2),u:'Tage'}},
+  ];
+  const c=pk(ctxs)();
+  $('tC').innerHTML=`<div class="tc"><div class="intro">⛵ <strong>Dreisatz bei indirekter Proportionalität – Schritt für Schritt</strong></div><div class="qbox">${c.q}</div>
+  <div class="stepbox"><div class="steplabel">Schritt 1: Auf 1 hochrechnen</div><div class="row"><span>${c.s1q}</span><input class="ni" id="s3d_0" data-a="${c.s1a}"></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 2: Ergebnis berechnen</div><div class="row"><span>${c.s2q}</span><input class="ni" id="s3d_1" data-a="${c.s2a}"><span>${c.u}</span></div></div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s3d_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s3d_0').value=c.s1a;$('s3d_1').value=c.s2a;$('fbk').innerHTML=`<div class="sol">Schritt 1: ${c.s1a}, Schritt 2: <strong>${c.s2a} ${c.u}</strong></div>`};
+}
+
+function s3_jeMehr(){
+  // "Je mehr/weniger" for indirect (like Aufgabe 7)
+  const stmts=[
+    {t:'Je mehr Leute mitessen, desto _____ bekommt jeder einzelne.',a:'weniger'},
+    {t:'Je weniger Maler mithelfen, desto _____ Zeit wird benötigt.',a:'mehr'},
+    {t:'Je mehr Kinder in einer Gruppe sind, desto _____ Gruppen werden es sein.',a:'weniger'},
+    {t:'Je weniger Pferde vorhanden sind, desto _____ Tage reicht der Futtervorrat.',a:'mehr'},
+    {t:'Je weniger Maschinen arbeiten, desto _____ Zeit wird benötigt.',a:'mehr'},
+  ];
+  let html=`<div class="tc"><div class="intro">⛵ Für indirekt proportionale Zuordnungen gilt: <strong>Je mehr, desto weniger</strong> bzw. <strong>je weniger, desto mehr</strong>. Setze „mehr" oder „weniger" ein.</div>`;
+  stmts.forEach((s,i)=>{const pts=s.t.split('_____');
+    html+=`<p style="margin:10px 0;line-height:1.8;">${pts[0]}<select class="gs" id="s3j_${i}" data-a="${s.a}"><option value="">?</option><option value="mehr">mehr</option><option value="weniger">weniger</option></select>${pts[1]}</p>`;
+  });
+  html+=`<div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkSels('s3j_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{stmts.forEach((s,i)=>{$('s3j_'+i).value=s.a;$('s3j_'+i).classList.add('ok')})};
+}
+
+function s3_indirOderNicht(){
+  // "Antiproportional oder nicht?" (like Aufgabe 8)
+  const scenarios=[
+    {t:'Matteo schätzt mit 4 Helfern 3 Stunden für seinen Umzug. Wie viel Zeit bei 6 Helfern?',a:'ja',w:'Mehr Helfer → weniger Zeit'},
+    {t:'Julias Lieblingsäpfel kosten 3 € pro kg. Wie viel für 2 kg, 5 kg, 8 kg?',a:'nein',w:'Preis pro kg ist konstant → direkt proportional'},
+    {t:'Ein T-Shirt kostet 20 €. Beim Kauf von 3 gibt es eines umsonst. Was kosten 5?',a:'nein',w:'Der Rabatt macht den Preis pro Stück nicht konstant'},
+    {t:'Der Lebensmittelvorrat reicht bei 32 Personen für 15 Tage. Wie lange bei 40?',a:'ja',w:'Mehr Personen → weniger Tage'},
+    {t:'Ein Film dauert 90 Minuten. Wie lange, wenn doppelt so viele Kinder zuschauen?',a:'nein',w:'Die Filmlänge hängt nicht von der Zuschauerzahl ab'},
+  ];
+  let cur=0,correct=0;
+  function renderQ(){
+    if(cur>=scenarios.length){
+      if(correct>=4){$('fbk').innerHTML=`<div class="fb s">${correct}/5 richtig! ${rs()}</div>`;taskOk()}
+      else{$('fbk').innerHTML=`<div class="fb h">${correct}/5 richtig.</div>`;G.ans=1;G.pts+=1;G.st[G.cs].p+=1;G.st[G.cs].mp+=3;$('nxBtn').classList.remove('hidden');sv();updBar()}
+      return;
+    }
+    const q=scenarios[cur];
+    $('tC').innerHTML=`<div class="tc"><div class="intro">⛵ <strong>Indirekt proportional oder nicht?</strong> (${cur+1}/5)</div>
+    <div class="qbox">${q.t}</div>
+    <div class="mo" style="justify-content:center;"><button class="mb" style="max-width:280px;" onclick="s3ion('ja')">✅ Indirekt proportional</button><button class="mb" style="max-width:280px;" onclick="s3ion('nein')">❌ Nicht indirekt proportional</button></div><div id="fbk"></div></div>`;
+  }
+  window.s3ion=function(ans){
+    const q=scenarios[cur];document.querySelectorAll('.mb').forEach(b=>b.classList.add('dis'));
+    if(ans===q.a){correct++;$('fbk').innerHTML=`<div class="fb s">Richtig! ${q.w}</div>`}
+    else{$('fbk').innerHTML=`<div class="fb e">${q.w}</div>`}
+    cur++;setTimeout(renderQ,2000);
+  };
+  renderQ();
+  solFn=()=>{$('tC').innerHTML=`<div class="tc"><div class="sol">${scenarios.map(s=>`<p><strong>${s.t}</strong><br>→ ${s.a==='ja'?'Indirekt proportional':'Nicht indirekt proportional'}: ${s.w}</p>`).join('')}</div></div>`};
+}
+
+function s3_dreisatzHard(){
+  // SpaceRun indirect tasks
+  const tasks=[
+    ()=>{const n=pk([3,4,5,7]);const h=pk([4,5,6,8,9]);const k=n*h;const n2=pk([2,6,8,10].filter(x=>x!==n&&k%x===0));return{q:`${n} Arbeiter graben einen Graben in ${h} Stunden. Wie lange dauert es mit ${n2} Arbeitern?`,a:k/n2,s:`${n}·${h}=${k}, ${k}÷${n2}=${k/n2} Stunden`}},
+    ()=>{const n=pk([12,15,20]);const h=pk([3,4,5]);const k=n*h;const n2=pk([4,5,6,10].filter(x=>x!==n&&k%x===0));return{q:`${n} Pumpen entleeren einen Teich in ${h} Stunden. Wie lange mit ${n2} Pumpen?`,a:k/n2,s:`${n}·${h}=${k}, ${k}÷${n2}=${k/n2} Stunden`}},
+    ()=>{const n=pk([5,7,10]);const h=pk([6,8,9,12]);const k=n*h;const n2=pk([3,6,14].filter(x=>x!==n&&k%x===0));return{q:`${n} Köche bereiten ein Bankett in ${h} Stunden vor. Wie viele Köche braucht man für ${pk([2,3,4])} Stunden?`,a:Math.ceil(k/pk([2,3,4])),s:`k=${k}`}},
+  ];
+  const t=pk(tasks)();
+  $('tC').innerHTML=`<div class="tc"><div class="intro">⛵ <strong>Dreisatz-Aufgabe (Niveau 3):</strong></div><div class="qbox">${t.q}</div>
+  <div class="row" style="justify-content:center;margin:16px 0;"><span>Ergebnis:</span><input class="ni" id="s3h_0" data-a="${t.a}"></div>
+  <div style="text-align:center;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s3h_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s3h_0').value=t.a;$('fbk').innerHTML=`<div class="sol">${t.s}</div>`};
+}
+
+// ============================================================
+// STATION 4: GEBIRGE – Gemischt
+// ============================================================
+function genS4(t){[s4_malerContext,s4_holzlattenContext,s4_wahrFalsch,s4_dreisatzDirekt,s4_dreisatzIndirekt,s4_mehrstufig][t]()}
+
+function s4_malerContext(){
+  // Maler: 2h=30m², fill table (like Aufgabe 1 from Prop&Antiprop)
+  const baseH=pk([2,3]);const baseM=pk([24,30,36,40]);const k=baseM/baseH;
+  const hours=[1,baseH,3,5,7].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b).slice(0,5);
+  let html=`<div class="tc"><div class="intro">🏔️ Ein Maler kann in <strong>${baseH} Stunden ${baseM} m²</strong> Wandfläche streichen. <strong>Direkt proportional!</strong> Fülle die Tabelle aus.</div>
+  <table class="vt"><tr><th>Zeit (h)</th>${hours.map(h=>`<td>${h}</td>`).join('')}</tr><tr><th>Fläche (m²)</th>`;
+  hours.forEach((h,i)=>{
+    if(h===baseH)html+=`<td>${baseM}</td>`;
+    else html+=`<td><input class="ni" id="s4m_${i}" data-a="${r2(k*h)}"></td>`;
+  });
+  html+=`</tr></table><div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s4m_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{hours.forEach((h,i)=>{if(h!==baseH){$('s4m_'+i).value=r2(k*h);$('s4m_'+i).style.borderColor='#22C55E'}});$('fbk').innerHTML=`<div class="sol">k = ${baseM} ÷ ${baseH} = ${k} m²/h</div>`};
+}
+
+function s4_holzlattenContext(){
+  // Holzlatten: 15×20cm, how many for other heights (like Aufgabe 2)
+  const baseN=pk([12,15,18,20]);const baseH=pk([15,20,25]);const k=baseN*baseH;
+  const heights=[5,10,baseH,15,20,25,30].filter((v,i,a)=>a.indexOf(v)===i&&k%v===0).sort((a,b)=>a-b).slice(0,5);
+  let html=`<div class="tc"><div class="intro">🏔️ Aylin benötigt <strong>${baseN} Holzlatten</strong> mit einer Höhe von <strong>${baseH} cm</strong>. Wie viele Latten braucht sie bei anderen Höhen? <strong>Indirekt proportional!</strong></div>
+  <table class="vt"><tr><th>Höhe (cm)</th>${heights.map(h=>`<td>${h}</td>`).join('')}</tr><tr><th>Anzahl</th>`;
+  heights.forEach((h,i)=>{
+    if(h===baseH)html+=`<td>${baseN}</td>`;
+    else html+=`<td><input class="ni" id="s4h_${i}" data-a="${k/h}"></td>`;
+  });
+  html+=`</tr></table><div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s4h_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  $('tC').innerHTML=html;
+  solFn=()=>{heights.forEach((h,i)=>{if(h!==baseH){$('s4h_'+i).value=k/h;$('s4h_'+i).style.borderColor='#22C55E'}});$('fbk').innerHTML=`<div class="sol">k = ${baseN} · ${baseH} = ${k}</div>`};
+}
+
+function s4_wahrFalsch(){
+  // 10 Wahr/Falsch statements (from Prop&Antiprop Aufgabe 3)
+  const stmts=[
+    {t:'Für indirekt proportionale Zuordnungen gilt „je mehr, desto mehr".',a:false},
+    {t:'Der Graph einer indirekt proportionalen Zuordnung ist eine Hyperbel.',a:true},
+    {t:'Bei direkt proportionalen Zuordnungen handelt es sich um ein gleichmäßiges Wachstum.',a:true},
+    {t:'Bei direkt proportionalen Zuordnungen gilt: „Wird eine Größe verdoppelt, halbiert sich die andere."',a:false},
+    {t:'Eine direkt proportionale Zuordnung verläuft immer durch den Ursprung.',a:true},
+    {t:'Bei indirekt proportionalen Zuordnungen gilt: Wird eine Größe verdreifacht, drittelt sich die andere.',a:true},
+    {t:'Ergeben die Werte in einem Diagramm eine Gerade, so handelt es sich immer um eine direkt proportionale Zuordnung.',a:false},
+    {t:'Jede Zuordnung, für die „je mehr, desto mehr" gilt, ist direkt proportional.',a:false},
+    {t:'Bei indirekt proportionalen Zuordnungen gilt: Läuft eine Größe gegen Null, so läuft die andere gegen Unendlich.',a:true},
+    {t:'Bei direkt proportionalen Zuordnungen bleibt der Quotient aus zugeordneter und Ausgangsgröße immer konstant.',a:true},
+  ];
+  let cur=0,correct=0;
+  function render(){
+    if(cur>=stmts.length){
+      if(correct>=8){$('fbk').innerHTML=`<div class="fb s">${correct}/${stmts.length} richtig! ${rs()}</div>`;taskOk()}
+      else if(correct>=6){$('fbk').innerHTML=`<div class="fb s">${correct}/${stmts.length} richtig! Gut! 👍</div>`;G.ans=1;G.pts+=2;G.st[G.cs].p+=2;G.st[G.cs].mp+=3;$('nxBtn').classList.remove('hidden');sv();updBar()}
+      else{$('fbk').innerHTML=`<div class="fb h">${correct}/${stmts.length} richtig.</div>`;G.ans=1;G.pts+=1;G.st[G.cs].p+=1;G.st[G.cs].mp+=3;$('nxBtn').classList.remove('hidden');sv();updBar()}
+      return;
+    }
+    const s=stmts[cur];
+    $('tC').innerHTML=`<div class="tc"><div class="intro">🏔️ <strong>Wahr oder Falsch?</strong> (${cur+1}/${stmts.length})</div>
+    <div class="qbox">${s.t}</div>
+    <div class="tfb"><button class="tf" onclick="s4wf(true)">✓ Wahr</button><button class="tf" onclick="s4wf(false)">✗ Falsch</button></div><div id="fbk"></div></div>`;
+  }
+  window.s4wf=function(ans){
+    const s=stmts[cur];document.querySelectorAll('.tf').forEach(b=>b.style.pointerEvents='none');
+    if(ans===s.a){correct++;document.querySelectorAll('.tf')[ans?0:1].classList.add('ok');$('fbk').innerHTML=`<div class="fb s">Richtig! ✓</div>`}
+    else{document.querySelectorAll('.tf')[ans?0:1].classList.add('no');$('fbk').innerHTML=`<div class="fb e">Die Antwort ist: ${s.a?'Wahr':'Falsch'}</div>`}
+    cur++;setTimeout(render,1800);
+  };
+  render();
+  solFn=()=>{$('tC').innerHTML=`<div class="tc"><div class="sol">${stmts.map(s=>`<p>${s.a?'✓ Wahr':'✗ Falsch'}: ${s.t}</p>`).join('')}</div></div>`};
+}
+
+function s4_dreisatzDirekt(){
+  // Muffins/Butter context (like Aufgabe 4)
+  const n1=pk([4,6,8]);const g=pk([20,25,30,35]);const n2=pk([15,18,20,24,27].filter(x=>x!==n1));
+  const g2=r2(g/n1*n2);
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🏔️ Oma Hannelore backt gerne. Für <strong>${n1} Muffins</strong> benötigt sie <strong>${g} g Butter</strong>. Wie viel Butter braucht sie für <strong>${n2} Muffins</strong>?</div>
+  <div class="stepbox"><div class="steplabel">Schritt 1: Butter pro Muffin</div><div class="row"><span>${g} g ÷ ${n1} =</span><input class="ni" id="s4d_0" data-a="${r2(g/n1)}"><span>g</span></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 2: Butter für ${n2} Muffins</div><div class="row"><input class="ni" id="s4d_1" data-a="${g2}"><span>g</span></div></div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s4d_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s4d_0').value=r2(g/n1);$('s4d_1').value=g2;$('fbk').innerHTML=`<div class="sol">${g}÷${n1}=${r2(g/n1)} g/Muffin, ·${n2}=<strong>${g2} g</strong></div>`};
+}
+
+function s4_dreisatzIndirekt(){
+  // Treppe context (like Aufgabe 5)
+  const stufen=pk([30,36,40,48]);const hoehe=pk([14,15,16,18]);
+  const k=stufen*hoehe;const h2=pk([12,15,18,20,24].filter(x=>x!==hoehe&&k%x===0));
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🏔️ Eine <strong>${stufen}-stufige Treppe</strong> hat Stufen mit einer Höhe von jeweils <strong>${hoehe} cm</strong>. Wie viele Stufen hätte die Treppe bei einer Stufenhöhe von <strong>${h2} cm</strong>?</div>
+  <div class="stepbox"><div class="steplabel">Schritt 1: Gesamthöhe der Treppe</div><div class="row"><span>${stufen} · ${hoehe} cm =</span><input class="ni" id="s4i_0" data-a="${k}"><span>cm</span></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 2: Stufen bei ${h2} cm Höhe</div><div class="row"><span>${k} cm ÷ ${h2} cm =</span><input class="ni" id="s4i_1" data-a="${k/h2}"><span>Stufen</span></div></div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s4i_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s4i_0').value=k;$('s4i_1').value=k/h2;$('fbk').innerHTML=`<div class="sol">Gesamthöhe: ${k} cm. ${k}÷${h2}=<strong>${k/h2} Stufen</strong></div>`};
+}
+
+function s4_mehrstufig(){
+  // Multi-step: Güterzüge (like Aufgabe 7 from Prop&Antiprop)
+  const tonnen=pk([540,600,660,690,720]);const waggons=pk([25,30,35]);
+  const tpw=r2(tonnen/waggons);
+  const zuege=pk([2,3,4]);const wpz=pk([18,20,22,24]);
+  const totalW=zuege*wpz;const totalT=r2(tpw*totalW);
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🏔️ <strong>Mehrstufige Aufgabe:</strong> Für den Transport von <strong>${tonnen} Tonnen Eisenerz</strong> werden <strong>${waggons} Waggons</strong> benötigt. Wie viele Tonnen können <strong>${zuege} Güterzüge mit je ${wpz} Waggons</strong> transportieren?</div>
+  <div class="stepbox"><div class="steplabel">Schritt 1: Tonnen pro Waggon</div><div class="row"><span>${tonnen} ÷ ${waggons} =</span><input class="ni" id="s4e_0" data-a="${tpw}"><span>t/Waggon</span></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 2: Gesamtzahl Waggons</div><div class="row"><span>${zuege} · ${wpz} =</span><input class="ni" id="s4e_1" data-a="${totalW}"><span>Waggons</span></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 3: Gesamte Tonnen</div><div class="row"><input class="ni" id="s4e_2" data-a="${totalT}"><span>Tonnen</span></div></div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s4e_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s4e_0').value=tpw;$('s4e_1').value=totalW;$('s4e_2').value=totalT;$('fbk').innerHTML=`<div class="sol">${tpw} t/W · ${totalW} W = <strong>${totalT} Tonnen</strong></div>`};
+}
+
+// ============================================================
+// STATION 5: STRAND – Dreisatz-Finale (SpaceRun-style)
+// ============================================================
+function genS5(t){[s5_sr1,s5_sr2,s5_sr3,s5_sr4,s5_sr5,s5_sr6,s5_zweistufig,s5_meerschweinchen][t]()}
+
+function mkSR(q,a,u,hint){
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🏖️ <strong>Dreisatz-Aufgabe:</strong></div><div class="qbox">${q}</div>
+  <div class="row" style="justify-content:center;margin:16px 0;"><span>Ergebnis:</span><input class="ni" id="s5_0" data-a="${a}"><span>${u}</span></div>
+  <div style="text-align:center;"><button class="btn bst" style="background:var(--cur)" onclick="s5chk()">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s5_0').value=a;$('fbk').innerHTML=`<div class="sol"><span class="lb">Lösung:</span> ${hint}</div>`};
+}
+function s5chk(){
+  if(G.ans)return;const v=pN($('s5_0').value),a=pN($('s5_0').dataset.a);
+  if(aE(v,a)){$('s5_0').style.borderColor='#22C55E';$('fbk').innerHTML=`<div class="fb s">${rs()}</div>`;taskOk()}
+  else{$('s5_0').style.borderColor='#EF4444';$('fbk').innerHTML=G.att===0?`<div class="fb e">Fast! 🤔</div>`:
+    `<div class="fb h">💡 Überlege: Ist es direkt oder indirekt proportional? Rechne dann auf 1.</div>`;taskNo()}
+}
+
+function s5_sr1(){
+  const n=pk([4,6,8]);const p=r2(n*pk([0.80,1.20,1.50,1.60]));const n2=pk([10,12,15]);
+  mkSR(`${n} Batterien kosten ${p.toFixed(2)} €. Wie viel kosten ${n2} Batterien?`,r2(p/n*n2),'€',`${p.toFixed(2)}÷${n}·${n2}=${r2(p/n*n2)} € (direkt proportional)`)
+}
+function s5_sr2(){
+  const n=pk([3,4,5,7]);const h=pk([4,6,8,9]);const k=n*h;const n2=pk([2,6,10].filter(x=>x!==n&&k%x===0));
+  mkSR(`${n} Traktoren pflügen ein Feld in ${h} Stunden. Wie lange brauchen ${n2} Traktoren?`,k/n2,'Stunden',`${n}·${h}=${k}, ${k}÷${n2}=${k/n2} h (indirekt proportional)`)
+}
+function s5_sr3(){
+  const n=pk([4,6,8]);const t=pk([100,120,140,150]);const n2=pk([5,7,10].filter(x=>x!==n));
+  const k=n*t;
+  mkSR(`Mit ${n} Maschinen lassen sich 150 Metallhülsen in ${t} Minuten herstellen. Wie lange brauchen ${n2} Maschinen?`,r2(k/n2),'Minuten',`${n}·${t}=${k}, ${k}÷${n2}=${r2(k/n2)} min (indirekt proportional)`)
+}
+function s5_sr4(){
+  const n=pk([2,3]);const h=pk([200,240,300]);const min=pk([30,45]);
+  mkSR(`Ein Auto fährt ${h} km in ${n} Stunden. Wie weit fährt es in ${min} Minuten?`,r2(h/n*(min/60)),'km',`${h}÷${n}=${h/n} km/h, in ${min} min: ${h/n}·${min}/60=${r2(h/n*min/60)} km`)
+}
+function s5_sr5(){
+  const n=pk([6,8,10]);const d=pk([4,5,6]);const ton=pk([400,500,600]);
+  const tpd=r2(ton/d);const n2=pk([3,4,5].filter(x=>x!==n));const d2=r2(ton*n/n2/tpd);// wrong, redo
+  // Simpler: direct
+  const ml=pk([250,500]);const p=r2(ml/100*pk([0.80,1.00,1.20]));const l2=pk([1000,1500,2000]);
+  mkSR(`${ml} ml Shampoo kosten ${p.toFixed(2)} €. Wie viel kosten ${l2} ml?`,r2(p/ml*l2),'€',`${p.toFixed(2)}÷${ml}·${l2}=${r2(p/ml*l2)} €`)
+}
+function s5_sr6(){
+  const n=pk([15,20,25]);const h=pk([4,5,6]);const k=n*h;const n2=pk([5,8,10].filter(x=>x!==n&&k%x===0));
+  mkSR(`${n} Fensterputzer reinigen ein Gebäude in ${h} Stunden. Wie viele Stunden brauchen ${n2} Fensterputzer?`,k/n2,'Stunden',`${n}·${h}=${k}, ${k}÷${n2}=${k/n2} h`)
+}
+
+function s5_zweistufig(){
+  // ZA1: Programmierer (like Zusatzaufgabe 1)
+  const prog=pk([10,12,15]);const hEach=pk([20,23,25]);const total=prog*hEach;
+  const hWorked=pk([6,8]);const done=prog*hWorked;const left=total-done;
+  const sick=pk([2,3]);const rem=prog-sick;const hLeft=r2(left/rem);
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🏖️ <strong>Zweistufiger Dreisatz (Zusatzaufgabe):</strong></div>
+  <div class="qbox">Eine IT-Firma plant <strong>${prog} Programmierer</strong> mit je <strong>${hEach} Arbeitsstunden</strong> ein. Nach <strong>${hWorked} Stunden</strong> melden sich <strong>${sick} Programmierer</strong> krank. Wie viele Stunden müssen die verbliebenen <strong>${rem} Programmierer</strong> noch arbeiten?</div>
+  <div class="stepbox"><div class="steplabel">Schritt 1: Gesamtarbeit (Personenstunden)</div><div class="row"><span>${prog} · ${hEach} =</span><input class="ni" id="s5z_0" data-a="${total}"></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 2: Bereits geleistet</div><div class="row"><span>${prog} · ${hWorked} =</span><input class="ni" id="s5z_1" data-a="${done}"></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 3: Restarbeit</div><div class="row"><span>${total} − ${done} =</span><input class="ni" id="s5z_2" data-a="${left}"></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 4: Stunden pro Person</div><div class="row"><span>${left} ÷ ${rem} =</span><input class="ni" id="s5z_3" data-a="${hLeft}"><span>Stunden</span></div></div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s5z_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s5z_0').value=total;$('s5z_1').value=done;$('s5z_2').value=left;$('s5z_3').value=hLeft;$('fbk').innerHTML=`<div class="sol">Gesamt: ${total}, geleistet: ${done}, Rest: ${left}, pro Person: <strong>${hLeft} h</strong></div>`};
+}
+
+function s5_meerschweinchen(){
+  // ZA2: Meerschweinchen (like Zusatzaufgabe 2)
+  const tage1=pk([8,10,12]);const ms1=pk([12,15,16,20]);const heu1=pk([8,10,12,15]);
+  const heuProMsTag=r2(heu1/(ms1*tage1));
+  const ms2=pk([15,18,20,24].filter(x=>x!==ms1));const tage2=pk([5,6,8].filter(x=>x!==tage1));
+  const heu2=r2(heuProMsTag*ms2*tage2);
+
+  $('tC').innerHTML=`<div class="tc"><div class="intro">🏖️ <strong>Dreifacher Dreisatz (Zusatzaufgabe):</strong></div>
+  <div class="qbox">In <strong>${tage1} Tagen</strong> essen <strong>${ms1} Meerschweinchen</strong> <strong>${heu1} kg Heu</strong>. Wie viel Heu essen <strong>${ms2} Meerschweinchen</strong> in <strong>${tage2} Tagen</strong>?</div>
+  <div class="stepbox"><div class="steplabel">Schritt 1: Heu pro Meerschweinchen pro Tag</div><div class="row"><span>${heu1} ÷ ${ms1} ÷ ${tage1} =</span><input class="ni" id="s5m_0" data-a="${heuProMsTag}"><span>kg</span></div></div>
+  <div class="stepbox"><div class="steplabel">Schritt 2: Heu für ${ms2} Meerschweinchen in ${tage2} Tagen</div><div class="row"><input class="ni" id="s5m_1" data-a="${heu2}"><span>kg</span></div></div>
+  <div style="text-align:center;margin-top:12px;"><button class="btn bst" style="background:var(--cur)" onclick="chkInps('s5m_','fbk')">Überprüfen ✓</button></div><div id="fbk"></div></div>`;
+  solFn=()=>{$('s5m_0').value=heuProMsTag;$('s5m_1').value=heu2;$('fbk').innerHTML=`<div class="sol">Pro MS/Tag: ${heuProMsTag} kg. ${ms2}·${tage2}·${heuProMsTag}=<strong>${heu2} kg</strong></div>`};
+}
+
+// ============================================================
+// BONUS
+// ============================================================
+function genBonus(t){
+  const fns=[s2_dreisatzHard,s3_dreisatzHard,s5_sr1,s5_sr2,s5_sr3,s5_sr4];
+  pk(fns)();G.st[5].tt=Math.max(G.st[5].tt,t+2);
+}
+
+// === INIT ===
+window.addEventListener('DOMContentLoaded',()=>{
+  if(ld()&&G.st[0].td>0){
+    const d=document.createElement('div');d.style.cssText='margin-top:20px;';
+    d.innerHTML=`<p style="color:var(--txL);margin-bottom:8px;">💾 Spielstand gefunden (${G.pts} Punkte)</p><button class="btn bs" onclick="contGame()" style="margin-right:8px;">Weiterspielen ▶️</button><button class="btn" style="background:#E2E8F0;color:var(--tx);" onclick="resetG()">Neues Spiel 🔄</button>`;
+    $('startScr').appendChild(d);
+  }
+});
+function contGame(){$('topBar').classList.remove('hidden');$('topTitle').textContent=G.name?G.name+'s Abenteuerreise':'Die große Abenteuerreise';$('mapGreet').innerHTML=`Willkommen zurück${G.name?', '+G.name:''}! 🌍`;buildMap();showScr('mapScr');updBar()}
+function resetG(){localStorage.removeItem('ar_s');location.reload()}
+</script>
+</body>
+</html>
